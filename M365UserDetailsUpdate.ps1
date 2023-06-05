@@ -3,56 +3,29 @@
 ## Set-ExecutionPolicy Unrestricted
 #####
 
-############################
-##
-## O365MailboxFullAccess.ps1
-##
-## Applies permission changes to a folder
-## Note: For delegates - see delegates.ps1
-##       For full permissions - see fullAccess.ps1
-##
-## CSV columns
-## IdentityFrom,IdentityTo,AddRemove,AutoMapping
-## Truvvo Assistant Team,admin@roundtableip.com,Add,FALSE
-## Truvvo Client Service,admin@roundtableip.com,Add,FALSE
-## 
-## IdentityFrom: Mailbox giving access.  Email or Display name
-## IdentityTo:   Mailbox getting access. Email or Display name
-## 
-## AddRemove 
-## Add   :  Add full access
-## Remove:  Remove full access
-##
-## AutoMapping
-## TRUE   : Automatically adds the inbox to left side of IdentityTo's Outlook (30 mins)  This is portal default.
-## FALSE  : Doesn't automap the inbox
-##
-############################
-
-
 #################### Transcript Open
 $Transcript = [System.IO.Path]::GetTempFileName()               
 Start-Transcript -path $Transcript | Out-Null
 #################### Transcript Open
 
-### Main function header - Put RethinkitFunctions.psm1 in same folder as script
+### Main function header - Put ITAutomator.psm1 in same folder as script
 $scriptFullname = $PSCommandPath ; if (!($scriptFullname)) {$scriptFullname =$MyInvocation.InvocationName }
 $scriptXML      = $scriptFullname.Substring(0, $scriptFullname.LastIndexOf('.'))+ ".xml"  ### replace .ps1 with .xml
 $scriptCSV      = $scriptFullname.Substring(0, $scriptFullname.LastIndexOf('.'))+ ".csv"  ### replace .ps1 with .csv
 $scriptDir      = Split-Path -Path $scriptFullname -Parent
 $scriptName     = Split-Path -Path $scriptFullname -Leaf
 $scriptBase     = $scriptName.Substring(0, $scriptName.LastIndexOf('.'))
-if ((Test-Path("$scriptDir\RethinkitFunctions.psm1"))) {Import-Module "$scriptDir\RethinkitFunctions.psm1" -Force} else {write-output "Err 99: Couldn't find RethinkitFunctions.psm1";Start-Sleep -Seconds 10;Exit(99)}
-# Get-Command -module RethinkitFunction  ##Shows a list of available functions
+if ((Test-Path("$scriptDir\ITAutomator.psm1"))) {Import-Module "$scriptDir\ITAutomator.psm1" -Force} else {write-output "Err 99: Couldn't find ITAutomator.psm1";Start-Sleep -Seconds 10;Exit(99)}
 ############
-$O365_PasswordXML   = $scriptDir+ "\O365_Password.xml"
+#$O365_PasswordXML   = $scriptDir+ "\O365_Password.xml"
 ############
+$props = "Mail","DisplayName","TelephoneNumber","Mobile","JobTitle","CompanyName","StreetAddress","City","State","PostalCode","Country"
 if (!(Test-Path $scriptCSV))
 {
     ######### Template
-    "IdentityFrom,IdentityTo,AddRemove,AutoMapping" | Add-Content $scriptCSV
-    "Truvvo Assistant Team,admin@roundtableip.com,Add,FALSE" | Add-Content $scriptCSV
-	"Truvvo Client Service,admin@roundtableip.com,Add,FALSE" | Add-Content $scriptCSV
+    $($props -join ",") | Add-Content $scriptCSV
+    "jsmith@domain.com,"+$(($props[1..$($props.Count)] | %{"New value or <clear> or leave blank to keep as is"}) -join ",") | Add-Content $scriptCSV
+    #$($props -join "New value or <clear> or leave blank to keep as is,") | Add-Content $scriptCSV
     ######### Template
 	$ErrOut=201; Write-Host "Err $ErrOut : Couldn't find '$(Split-Path $scriptCSV -leaf)'. Template CSV created. Edit CSV and run again.";Pause; Exit($ErrOut)
 }
@@ -61,7 +34,7 @@ $entries=@(import-csv $scriptCSV)
 $entries_cols = ($entries | Get-Member | Where-Object -Property "MemberType" -EQ "NoteProperty" | Select-Object "Name").Name
 $entriescount = $entries.count
 ##
-$props = "Mail","DisplayName","TelephoneNumber","Mobile","JobTitle","CompanyName","StreetAddress","City","State","PostalCode","Country"
+
 ####
 Write-Host "-----------------------------------------------------------------------------"
 Write-Host ("$scriptName        Computer:$env:computername User:$env:username PSver:"+($PSVersionTable.PSVersion.Major))
@@ -69,7 +42,7 @@ Write-Host ""
 Write-Host "Bulk actions in O365"
 Write-Host ""
 #Write-Host "admin_username: $($Globals.admin_username)"
-Write-Host "XML: $(Split-Path $O365_PasswordXML -leaf)"
+#Write-Host "XML: $(Split-Path $O365_PasswordXML -leaf)"
 Write-Host "CSV: $(Split-Path $scriptCSV -leaf) ($($entriescount) entries)"
 Write-Host "Possible column names are:"
 Write-Host "Mail (Required),$($props -join ",")"  -ForegroundColor Green
@@ -148,14 +121,17 @@ Catch{Connect-AzureAD}
                     }
                     ElseIf ($x.$prop -eq "<clear>")
                     {
-                        if ($aduser.$prop -eq "")
+                        if (($aduser.$prop -eq "") -or ($aduser.$prop -eq $null))
                         {
                             Write-Host "$($prop): $($aduser.$prop) <clear> [Already OK]"
                         }
                         else
                         {
                             Write-Host "$($prop): $($aduser.$prop) <clear>" -ForegroundColor Yellow
-                            Set-AzureADUser -ObjectId $aduser.ObjectId -$($prop) ""
+                            $properties = [Collections.Generic.Dictionary[[String],[String]]]::new()
+                            $properties.Add($prop, [NullString]::Value)
+                            Set-AzureADUser -ObjectId $aduser.ObjectId -ExtensionProperty $properties
+#                            Set-AzureADUser -ObjectId $aduser.ObjectId -$($prop) ""
                             $change_made = $true
                         }
                     }

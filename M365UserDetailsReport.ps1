@@ -3,46 +3,20 @@
 ## Set-ExecutionPolicy Unrestricted
 #####
 
-############################
-##
-## O365MailboxFullAccess.ps1
-##
-## Applies permission changes to a folder
-## Note: For delegates - see delegates.ps1
-##       For full permissions - see fullAccess.ps1
-##
-## CSV columns
-## IdentityFrom,IdentityTo,AddRemove,AutoMapping
-## Truvvo Assistant Team,admin@roundtableip.com,Add,FALSE
-## Truvvo Client Service,admin@roundtableip.com,Add,FALSE
-## 
-## IdentityFrom: Mailbox giving access.  Email or Display name
-## IdentityTo:   Mailbox getting access. Email or Display name
-## 
-## AddRemove 
-## Add   :  Add full access
-## Remove:  Remove full access
-##
-## AutoMapping
-## TRUE   : Automatically adds the inbox to left side of IdentityTo's Outlook (30 mins)  This is portal default.
-## FALSE  : Doesn't automap the inbox
-##
-############################
-
 
 #################### Transcript Open
 $Transcript = [System.IO.Path]::GetTempFileName()               
 Start-Transcript -path $Transcript | Out-Null
 #################### Transcript Open
 
-### Main function header - Put RethinkitFunctions.psm1 in same folder as script
+### Main function header - Put ITAutomator.psm1 in same folder as script
 $scriptFullname = $PSCommandPath ; if (!($scriptFullname)) {$scriptFullname =$MyInvocation.InvocationName }
 $scriptXML      = $scriptFullname.Substring(0, $scriptFullname.LastIndexOf('.'))+ ".xml"  ### replace .ps1 with .xml
 $scriptCSV      = $scriptFullname.Substring(0, $scriptFullname.LastIndexOf('.'))+ ".csv"  ### replace .ps1 with .csv
 $scriptDir      = Split-Path -Path $scriptFullname -Parent
 $scriptName     = Split-Path -Path $scriptFullname -Leaf
 $scriptBase     = $scriptName.Substring(0, $scriptName.LastIndexOf('.'))
-if ((Test-Path("$scriptDir\RethinkitFunctions.psm1"))) {Import-Module "$scriptDir\RethinkitFunctions.psm1" -Force} else {write-output "Err 99: Couldn't find RethinkitFunctions.psm1";Start-Sleep -Seconds 10;Exit(99)}
+if ((Test-Path("$scriptDir\ITAutomator.psm1"))) {Import-Module "$scriptDir\ITAutomator.psm1" -Force} else {write-output "Err 99: Couldn't find ITAutomator.psm1";Start-Sleep -Seconds 10;Exit(99)}
 # Get-Command -module RethinkitFunction  ##Shows a list of available functions
 ############
 
