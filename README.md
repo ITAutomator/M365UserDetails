@@ -2,7 +2,7 @@
 # M365 User Details
 ![ReportRun](https://github.com/ITAutomator/M365UserDetails/assets/135157036/fd3094e1-aecc-40a4-82e7-968e503e66a0)
 
-Export / Import (in bulk) your user's Microsoft 365 Azure AD Details using CSV files.
+Export / Import (in bulk) your users' Microsoft 365 Azure AD Details using CSV files.
 Also creates CSV reports that export existing details.
 
 ### Installation
