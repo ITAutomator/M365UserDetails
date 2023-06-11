@@ -5,6 +5,12 @@ www.itautomator.com<br>
 Export / Import (in bulk) your user's Microsoft 365 Azure AD Details using CSV files.
 Also creates CSV reports that export existing details.
 
+### Installation
+1. Go [here]([url](https://github.com/ITAutomator/M365UserDetails)) 
+2. Click the green Code button and choose Download Zip
+3. Unzip the files to a folder
+4. Find the .ps1 file and right-click Run (or right-click Edit and run it inside the Powershell Editor)
+
 ## M365UserDetailsReport.ps1
 Use the report tool to export your users' telephone numbers, etc properties.<br>
 It will generate a file like this:<br>
