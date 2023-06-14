@@ -1,4 +1,5 @@
 [www.itautomator.com](https://www.itautomator.com/m365-user-details/)<br>
+See pricing [here](https://www.itautomator.com/pricing/)
 # M365 User Details
 ![ReportRun](https://github.com/ITAutomator/M365UserDetails/assets/135157036/fd3094e1-aecc-40a4-82e7-968e503e66a0)
 
